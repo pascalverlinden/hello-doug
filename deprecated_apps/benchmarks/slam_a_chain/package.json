@@ -1,34 +1,26 @@
 {
   "name": "slams",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.1.0",
+  "author": "David Braun",
+  "dependencies": {
+    "@monax/legacy-contracts": "0.16.3",
+    "@monax/legacy-db": "0.16.2",
+    "humanize-duration": "^3.9.1",
+    "mz": "^2.4.0",
+    "numeral": "^2.0.6",
+    "request-promise": "4.2.0",
+    "solc": "^0.3.6"
+  },
+  "devDependencies": {
+    "husky": "^0.13.3",
+    "standard": "^10.0.2"
+  },
+  "keywords": [],
+  "license": "ISC",
   "main": "index.js",
   "scripts": {
     "precommit": "standard",
-    "start": "node lib",
-    "test": "istanbul cover _mocha -- test/unit"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "bluebird": "^3.4.1",
-    "eris-contracts": "^0.13.3",
-    "eris-db": "^0.15.0",
-    "fairmont": "^1.1.6",
-    "humanize-duration": "^3.9.1",
-    "is-promise": "^2.1.0",
-    "mz": "^2.4.0",
-    "numeral": "^1.5.3",
-    "ramda": "^0.21.0",
-    "solc": "^0.3.6",
-    "untildify": "^3.0.2"
-  },
-  "devDependencies": {
-    "husky": "^0.11.6",
-    "istanbul": "^0.4.4",
-    "mocha": "^3.0.0",
-    "standard": "^8.0.0-beta.5"
+    "start": "node lib"
   },
   "standard": {
     "globals": [
