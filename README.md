@@ -1,9 +1,36 @@
-# hello-eris
+# Hello Doug Demo Application
 
-Quick Start demo applications using the `eris` blockchain tooling.
+## Setup
 
-This repository contains example applications of varying complexity and kind to demonstrate the `eris` stack in action.
+### Project
 
-Examples are organized first by their kind (e.g., `apps/`, `benchmarks/`) and second by their name within any kind directory.
+```
+npm install
+```
 
-Each example directory should contain: 1) a brief `readme.md`, 2) a `Dockerfile`, and 3) a single `test.sh` that returns an exit code.
+### Test Chain
+
+```
+cd test
+monax keys import chain-config/export-account
+monax chains new hello --dir chain-config
+```
+
+### Contract Deployment
+In Bash Shell:
+
+```
+cd contracts
+account=$(sed -n -e '/Address/ s/.*Address\":\"\([[:alnum:]]*\)\".*$/\1/p' ../test/chain-config/export-account)
+monax pkgs do -c hello -a $account
+```
+
+### Application
+
+- Run the test/hello-test.js mocha/chai test script to invoke some basic JS functions
+- Use a REST client / browser with the following URLs:
+ - POST http://localhost:3080/deals Body: `{"id": "234232", "buyer": "Mike", "seller": "Laura", "amount": 23984}`
+ - GET http://localhost:3080/deals
+ - GET http://localhost:3080/deal/234232
+
+**NOTE**: the application currently does not support conversion of decimal input, so only full integer amounts can be stored.
