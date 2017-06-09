@@ -123,11 +123,11 @@ contract DealManager {
     /**
      * Adds a new deal with the specified attributes
      */
-    function addDeal(bytes32 _id, bytes32 _buyer, bytes32 _seller, uint _amount) returns (bool) {
+    function addDeal(bytes32 _id, bytes32 _buyer, bytes32 _seller, uint _amount) returns (address dealAddress) {
         Deal deal = new Deal(_id, _buyer, _seller, _amount);
         insert(_id, deal);
         NewDeal(deal, deal.id(), deal.buyer(), deal.seller(), deal.amount());
-        return true;
+        return deal;
     }
 
 }

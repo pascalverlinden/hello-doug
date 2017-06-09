@@ -23,25 +23,28 @@ var eris = require(__libs+'/eris-wrapper');
     // ##############
     // The following part depends on local files that are generated during contract deployment via EPM
     // ##############
-    var epmData = require(__contracts+'/epm.json');
-    var messageFactoryAbi = JSON.parse(fs.readFileSync(__contracts+'/abi/DealManager'));
-    var messageAbi = JSON.parse(fs.readFileSync(__contracts+'/abi/Deal'));
+    var epmData = require(__contracts+'/jobs_output.json');
+    var dealManagerAbi = JSON.parse(fs.readFileSync(__contracts+'/abi/DealManager'));
+    var dealAbi = JSON.parse(fs.readFileSync(__contracts+'/abi/Deal'));
 
     // Instantiate connection
-    var erisWrapper = new eris.NewWrapper( (__settings.eris.chain.host || 'localhost'), (__settings.eris.chain.port || '1337') );
+    var erisWrapper = new eris.NewWrapper( (__settings.eris.chain.host || 'localhost'), (__settings.eris.chain.port || '32770') );
     // Create contract objects
-    var dealManager = erisWrapper.createContract(messageFactoryAbi, epmData['DealManager']);
-    var dealContract = erisWrapper.createContract(messageAbi, epmData['Deal']);
+    var dealManagerFactory = erisWrapper.createContractFactory(dealManagerAbi, true);
+    var dealManager = dealManagerFactory.at(epmData['DealManager']);
+    var dealFactory = erisWrapper.createContractFactory(dealAbi, true);
 
     // Event Registration
     dealManager.NewDeal(
         function (error, eventSub) {
             if(error) { throw error; }
-            //eventSubNew = eventSub; // ignoring this for now
+            // eventSubNew = eventSub; // ignoring this for now
         },
         function (error, event) {
             if(event) {
                 chainEvents.emit(events.NEW_DEAL, event.args.contractAddress, eris.hex2str(event.args.id),
+                    eris.hex2str(event.args.buyer), eris.hex2str(event.args.seller), event.args.amount);
+                chainEvents.emit(events.NEW_DEAL+'_'+event.args.id, event.args.contractAddress, eris.hex2str(event.args.id),
                     eris.hex2str(event.args.buyer), eris.hex2str(event.args.seller), event.args.amount);
             }
         });
@@ -61,10 +64,11 @@ var eris = require(__libs+'/eris-wrapper');
      * @param callback
      */
     var addDeal = function(deal, callback) {
-        dealManager.addDeal(eris.str2hex(deal.id), eris.str2hex(deal.buyer),
-                        eris.str2hex(deal.seller), deal.amount, function(error, result) {
-            log.debug('Created new deal id: '+deal.id+'buyer:'+deal.buyer+', seller: '+deal.seller+', amount: '+deal.amount);
-            callback(error);
+        dealManager.addDeal(deal.id, deal.buyer,
+                        deal.seller, deal.amount, function(error, result) {
+            console.dir(result);
+            log.debug('Created new deal at address '+result['dealAddress']+' with id: '+deal.id+', buyer:'+deal.buyer+', seller: '+deal.seller+', amount: '+deal.amount);
+            callback(error, result);
         });
     };
 
@@ -99,7 +103,7 @@ var eris = require(__libs+'/eris-wrapper');
             var deals = [];
             async.each(addresses, function iterator(addr, callback) {
                 log.debug('Retrieving deal data for address: ' + addr);
-                dealContract.at(addr, function(error, contract) {
+                dealFactory.at(addr, function(error, contract) {
                     if (error) {
                         // ignoring error for now in order to continue with other contracts
                         log.error('Failure to access contract at address '+addr+': '+error);
@@ -133,7 +137,7 @@ var eris = require(__libs+'/eris-wrapper');
      * @param callback
      */
     var getDealAtAddress = function(address, callback) {
-        dealContract.at(address, function(error, contract) {
+        dealFactory.at(address, function(error, contract) {
             if (error) { throw error; }
             createDealFromContract(contract, callback);
         });

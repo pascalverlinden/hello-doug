@@ -1,12 +1,13 @@
 
 # IDE-generated
+.project
 .idea
 .mix
 package
 
 # Compiler-generated
 abi
-epm.json
+jobs_output.json
 
 # Other
 node_modules

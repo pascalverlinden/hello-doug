@@ -39,11 +39,22 @@ var db = require(__libs+'/hello-db');
     // POST new deal
     app.post('/deals', function(req, res) {
         var deal = req.body;
-        chain.addDeal(deal, function(error) {
-            // needs timeout!
-            db.listen.once( db.events.NEW_DEAL+'_'+deal.id, function(deal) {
-                res.sendStatus(200);
-            });
+        log.debug('Request to create new deal: '+deal.id);
+        chain.addDeal(deal, function(error, dealAddress) {
+            log.debug('Deal created: '+dealAddress);
+            res.sendStatus(200);
+            // callback to wait for the confirmation from the DB that it has received the data from the event
+            // var eventNewDeal = function(error, newDeal) {
+            //     if (newDeal)
+            //         res.sendStatus(200);
+            //     else {
+            //         console.dir(this);
+            //         db.listen.removeListener(db.events.NEW_DEAL+'_'+deal.id, this);
+            //         res.sendStatus(500);
+            //     }
+            // }
+            // setTimeout(eventNewDeal, 5000, new Error('Timeout'));
+            // db.listen.once( db.events.NEW_DEAL+'_'+deal.idr, eventNewDeal);
         });
     });
 

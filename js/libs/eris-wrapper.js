@@ -4,6 +4,9 @@ var erisC = require('eris-contracts');
 var EventEmitter = require('events');
 var util = require('util');
 var logger = require(__libs+'/eris-logger');
+const I = require('iteray');
+const R = require('ramda');
+const stream = require('stream');
 
 (function () {
 
@@ -24,33 +27,39 @@ var logger = require(__libs+'/eris-logger');
         //TODO find a better way to easily test
         account = account || require('../../test/chain-config/accounts.json')[__settings.eris.chain.devAccount];
 
+        const observer = (asyncIterable) => R.pipe(
+          I.map((event) => JSON.stringify(event, null, 2) + '\n\n'),
+          I.to(stream.Readable)
+        )(asyncIterable).pipe(process.stderr)
+
         var self = this;
         self.erisdbURL = 'http://'+host+':'+port+'/rpc';
-        self.contractManager = erisC.newContractManagerDev(self.erisdbURL, account);
+        self.contractManager = erisC.newContractManagerDev(self.erisdbURL, account, {observer: process.env.DEBUG ? observer : I.sink});
         self.listen = new ErisEvents();
     }
 
     ErisWrapper.prototype.events = {}; //TODO to be defined, e.g. contract added event
 
-    ErisWrapper.prototype.createContract = function(abi, address, jsonOutput) {
+    /**
+     * Creates and returns a contractFactory for the given ABI. If an address is provided, the
+     * object will allow communicating with that contract instance.
+     */
+    ErisWrapper.prototype.createContractFactory = function(abi, jsonOutput) {
 
         //TODO check inputs, check existing contract at name
-
         if(log.isDebugEnabled()) {
-            log.debug('Creating contract factory with ABI '+abi+' at address '+address+'.');
+            log.debug('Creating contract factory from ABI.');
         }
-        // instantiate the contract objects using the abi and address
-        var contract;
-        if(address) {
-            contract = this.contractManager.newContractFactory(abi).at(address);
-        } else {
-            contract = this.contractManager.newContractFactory(abi);
-        }
-        // Turn on JSON output for bundle contracts
+        // instantiate the contract factory using the abi.
+        var factory = this.contractManager.newContractFactory(abi);
+
         if(jsonOutput) {
-            contract.setOutputFormatter(erisC.outputFormatters.jsonStrings);
+            if(log.isDebugEnabled()) {
+                log.debug('Enabling json output on contract factory.');
+            }
+            factory.setOutputFormatter(erisC.outputFormatters.jsonStrings);
         }
-        return contract;
+        return factory;
     }
 
     /*
@@ -70,7 +79,7 @@ var logger = require(__libs+'/eris-logger');
 
     /* Converts given hex to string and removes trailing null character */
     var hex2str = function (hexx) {
-        return String(Buffer(hexx, 'hex')).replace(/\0/g, '');
+        return String(new Buffer(hexx, 'hex')).replace(/\0/g, '');
     }
 
     module.exports = {

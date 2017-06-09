@@ -9,6 +9,7 @@ describe("Hello Eris Test", function() {
     this.timeout(5000); // 5 sec timeout to account for block commit delay
 
     it("Module Initialization", function(done) {
+        setTimeout(done, 3000);
         chain.init(function(error) {
             expect(error).to.be.null;
             db.refresh(function(error) {
@@ -23,10 +24,12 @@ describe("Hello Eris Test", function() {
         var deal1 = {id: 'i1', buyer: 'John', seller: 'Hank', amount: 7364};
 
         it("Add Deal", function(done) {
+            setTimeout(done, 5000);
             chain.addDeal(deal1, function (error) {
                 expect(error).to.be.null;
                 chain.getDeals(function (error, deals) {
                     expect(error).to.be.null;
+                    expect(deals).to.be.defined;
                     expect(deals.length).to.equal(1);
                     expect(deals[0].id).to.equal(deal1.id);
                     expect(deals[0].buyer).to.equal(deal1.buyer);
