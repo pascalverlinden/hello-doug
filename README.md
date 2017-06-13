@@ -48,6 +48,6 @@ From the project root directory:
 - Use a REST client (e.g. Postman) with the following URLs:
  - POST `http://localhost:3080/deals` Body (application/json): `{"id": "234232", "buyer": "Mike", "seller": "Laura", "amount": 15000.99}`
  - GET `http://localhost:3080/deals`
- - GET `http://localhost:3080/deal/234232`
+ - GET `http://localhost:3080/deals/234232`
 
 Note: the application currently only supports storing full integer amounts in the smart contract, so a decimal amount is converted by multiplying/dividing as it enters and leaves the NodeJS application.
