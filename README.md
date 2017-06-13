@@ -34,7 +34,7 @@ fullAccount=$(jq -r '.["hello-chain_full_000"].address' ../config/accounts.json)
 monax pkgs do -c hello-chain -a $fullAccount
 ```
 
-Note: If you do not have `jq` available on the commandline, you can also simply manually copy the address of the _full_ account from `accounts.json` to use as parameter for the `eris pkgs` command.
+Note: If you do not have `jq` available on the commandline, you can also simply manually copy the address of the _full_ account from `accounts.json` to use as parameter for the `monax pkgs` command.
 
 ### Application Startup
 From the project root directory:
