@@ -40,7 +40,7 @@ Note: If you do not have `jq` available on the commandline, you can also simply 
 From the project root directory:
 
 #### Checklist
-- Ensure the chain container's IP address is set correctly in `config/settings.toml`. To do so, run `eris chains inspect hello-chain` and use the `IPAddress` value in the settings.toml file for the `host` setting.
+- Ensure the chain container's IP address is set correctly in `config/settings.toml`. To do so, run `monax chains inspect hello-chain` and use the `IPAddress` value in the settings.toml file for the `host` setting.
 - If your chain is using a host port other than `1337` (which is mapped to port 1337 of the chain container), please adjust the _chain.port_ setting in `config/settings.toml` accordingly. (Hint: Use `monax chains ports hello-chain` to see used ports for hello-chain)
 
 #### Run Node App
