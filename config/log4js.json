@@ -1,13 +1,9 @@
 {
   "loggers" : [
     {
-      "name": "default",
-      "level": "INFO"
-    },
-    {
-      "name": "erisDbLogger",
-      "level": "DEBUG",
-      "category": "eris.wrapper"
+      "name": "Main",
+      "level": "INFO",
+      "category": "Main"
     }
   ],
   "appenders": [
@@ -16,10 +12,20 @@
     },
     {
       "type": "file",
-      "filename": "logs/eris.log",
+      "filename": "logs/main.log",
       "maxLogSize": 2048,
-      "backups": 3,
-      "category": "eris.hello"
+      "backups": 3
+    },
+    {
+      "type": "file",
+      "filename": "logs/events.log",
+      "maxLogSize": 4096,
+      "category": "monax.events"
     }
-  ]
+  ],
+  "levels": {
+        "[all]": "INFO",
+        "monax": "DEBUG",
+        "hello": "DEBUG"
+    }
 }
