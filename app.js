@@ -1,34 +1,38 @@
 
 // Set up global directory constants used throughout the app
-global.__libs = __dirname + '/js/libs';
-global.__routes = __dirname + '/js/routes';
-global.__config = __dirname + '/config';
-global.__contracts = __dirname + '/contracts';
+global.__appDir = __dirname;
+global.__libs = __appDir + '/js/libs';
+global.__config = __appDir + '/config';
+global.__contracts = __appDir + '/contracts';
+global.__abi = __contracts + '/abi';
+global.__sqlsol = __appDir + '/sqlsol';
 
 // External dependencies
 var fs = require('fs');
-var toml = require('toml-js');
+var toml = require('toml');
 
 // Read configuration
-var configFilePath = process.env.ERIS_CONFIG || __config+'/settings.toml';
+var configFilePath = process.env.MONAX_CONFIG || __config+'/settings.toml';
 global.__settings = toml.parse( fs.readFileSync(configFilePath) );
 
 // Local modules require configuration to be loaded
-var logger = require(__libs+'/eris-logger');
-var chain = require(__libs+'/hello-chain');
-var db = require(__libs+'/hello-db');
-var server = require(__libs+'/hello-server');
+var logger = require(__libs+'/monax-logger');
+var server;
 
 var log = logger.getLogger('Main');
 
-chain.init( function(error) {
-    if(error) {
-        log.error('Unexpected error initializing chain layer: '+error.message);
-    }
-   db.refresh( function(error) {
-        if(error) {
-           log.error('Unexpected error initializing persistence layer: '+error.message);
-        }
-        log.info('Hello Eris Application started successfully ...');
-   })
+log.info('Starting platform ...')
+var contracts = require(__libs+'/hello-contracts');
+
+// Module initialization sequence
+contracts.load().then(() => {
+	log.info('Contracts loaded.');
+	return contracts.initCache();
+}).then(() => {
+	log.info('SQL Cache initiated.')
+	server = require(__libs+'/hello-web-api');
+	log.info('Web API started and ready for requests.');
+	log.info('Application started successfully ...');
+}).catch(error => {
+	log.error('Unexpected error initializing the application: '+error.message);
 });

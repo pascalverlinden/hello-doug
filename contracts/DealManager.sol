@@ -1,3 +1,4 @@
+pragma solidity ^0.4.4;
 
 import "Deal.sol";
 
@@ -5,6 +6,9 @@ import "Deal.sol";
  * Contract to create and store deals
  */
 contract DealManager {
+
+	// Events starting with "Update..." will be detected by the SQLSOL cache to keep table data in sync.
+    event UpdateDeal(string table, bytes32 key);
 
     event NewDeal(address contractAddress, bytes32 id, bytes32 buyer, bytes32 seller, uint amount);
 
@@ -103,13 +107,6 @@ contract DealManager {
         return int(elem.keyIdx);
     }
 
-    /**
-     * @return the size of the mapping, i.e. the number of currently stored entries
-     */
-    function size() constant returns (uint) {
-        return mapSize;
-    }
-
      /**
       * @return the address value registered at the specified key
       */
@@ -127,7 +124,41 @@ contract DealManager {
         Deal deal = new Deal(_id, _buyer, _seller, _amount);
         insert(_id, deal);
         NewDeal(deal, deal.id(), deal.buyer(), deal.seller(), deal.amount());
+        fireUpdateEvents(deal.id());
         return deal;
     }
 
+	/**
+	 * SQLSOL support functions
+	 */
+	 
+    /**
+     * @return the size of the mapping, i.e. the number of currently stored deals
+     */
+    function getNumberOfDeals() constant returns (uint size) {
+        return mapSize;
+    }
+
+	/**
+	 * @return the deal ID at the given index position (or 0 if the index is out of bounds)
+	 */
+	function getDealIdAtIndex(uint _index) constant returns (bytes32 id) {
+		return keyAtIndex(_index);
+	}
+	
+	/**
+	 * @return the attributes of the deal with the given ID
+	 */
+	function getDealData(bytes32 _dealId) constant returns (bytes32 buyer, bytes32 seller, uint amount, address dealAddress) {
+		Deal deal = Deal(value(_dealId));
+		return (deal.buyer(), deal.seller(), deal.amount(), deal);
+	}
+	
+	/**
+	 * Fires SQLSOL-relevant events to update tables
+	 */
+	function fireUpdateEvents(bytes32 _id) {
+		UpdateDeal("DEALS", _id);
+	}
+	 
 }

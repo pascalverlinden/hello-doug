@@ -12,3 +12,4 @@ jobs_output.json
 # Other
 node_modules
 logs
+accounts.json

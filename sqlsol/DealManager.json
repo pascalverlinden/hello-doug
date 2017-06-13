@@ -1,0 +1,11 @@
+{
+  "initSeq":{
+    "dealId":{"deserialize":"getDealIdAtIndex", "len":{"call": "getNumberOfDeals", "field": "size"}}
+  },
+  "tables":{
+    "DEALS":{
+      "call": "getDealData",
+      "keys": ["dealId"]
+    }
+  } 
+}

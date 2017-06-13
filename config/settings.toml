@@ -1,12 +1,30 @@
 
-[eris]
+[manager]
+# This section allows specifying how contracts are managed. There are two mutually-exclusive chaines:
+# 1. DOUG: The address of DOUG contract from Monax's Base SDK that manages the solution
+# 2. ContractAddresses: a JSON file containing name<->address pairs
 
-    [eris.server]
-        port_http =               # default: 3080
-        port_https =              # default: 3443
-        context_path =            # default: dcc
+#DOUG = ""
+ContractAddresses = "contracts/jobs_output.json"
 
-    [eris.chain]
-        host = "192.168.99.100"
-        port = 1337
-        devAccount = "hello-chain_full_000"     # for testing only! The account to use from test/chain-config/accounts.json
+[server]
+# Settings for the REST API server
+
+#port_http =               # default: 3080
+#port_https =              # default: 3443
+#context_path = hello-doug           # default: portal
+
+[chain]
+# Settings for the chain node 
+
+host = "localhost"
+port = 1337
+
+[accounts]
+# Special accounts used by the application.
+
+server = "hello-chain_full_000"     # for testing only! The account to use from directory config/accounts.json
+
+[contracts]
+# To automatically load contracts, the addresses of the deployed contracts have to be known. This is done either via DOUG or through a JSON file (see DOUG or ContractAddresses setting above).
+load = "DealManager"
